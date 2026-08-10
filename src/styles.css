@@ -15,6 +15,11 @@
 
 html { min-width: 320px; background: #f5f7fb; }
 
+html.dark {
+  background: #020617;
+  color-scheme: dark;
+}
+
 body {
   margin: 0;
   min-width: 320px;
@@ -42,6 +47,74 @@ input[type="number"] { -moz-appearance: textfield; }
 }
 
 .tabular { font-variant-numeric: tabular-nums; }
+
+.signature {
+  font-family: "Snell Roundhand", "Brush Script MT", "Segoe Script", cursive;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+html.dark body {
+  color: #e2e8f0;
+  background:
+    radial-gradient(circle at 5% 0%, rgba(99, 102, 241, 0.16), transparent 28rem),
+    #020617;
+}
+
+html.dark .card {
+  border-color: rgba(51, 65, 85, 0.85);
+  background: #0f172a;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.16);
+}
+
+html.dark .input-shell {
+  border-color: #334155;
+  background: #111c2f;
+}
+
+html.dark .input-shell:focus-within {
+  border-color: #818cf8;
+  background: #0f172a;
+  --tw-ring-color: rgba(99, 102, 241, 0.25);
+}
+
+html.dark .bg-white { background-color: #0f172a; }
+html.dark .bg-slate-50,
+html.dark .bg-slate-50\/70,
+html.dark .bg-slate-100 { background-color: #172033; }
+html.dark .bg-blue-50 { background-color: rgba(37, 99, 235, 0.16); }
+html.dark .bg-violet-50 { background-color: rgba(124, 58, 237, 0.16); }
+html.dark .bg-amber-50 { background-color: rgba(217, 119, 6, 0.16); }
+html.dark .bg-emerald-50 { background-color: rgba(5, 150, 105, 0.16); }
+html.dark .bg-brand-50 { background-color: rgba(99, 102, 241, 0.16); }
+
+html.dark .text-slate-900,
+html.dark .text-slate-800,
+html.dark .text-slate-700 { color: #e2e8f0; }
+html.dark .text-slate-600,
+html.dark .text-slate-500 { color: #94a3b8; }
+html.dark .text-slate-400 { color: #7c8ba1; }
+html.dark .text-slate-300 { color: #64748b; }
+html.dark .text-blue-600 { color: #60a5fa; }
+html.dark .text-violet-600 { color: #a78bfa; }
+html.dark .text-amber-600 { color: #fbbf24; }
+html.dark .text-emerald-600 { color: #34d399; }
+html.dark .text-brand-600,
+html.dark .text-brand-700 { color: #a5b4fc; }
+
+html.dark .border-slate-100,
+html.dark .border-slate-200,
+html.dark .border-slate-200\/70,
+html.dark .border-slate-200\/80,
+html.dark .border-slate-300 { border-color: #334155; }
+
+html.dark input { color: #e2e8f0; }
+html.dark input::placeholder { color: #475569; }
+
+html.dark ::-webkit-scrollbar { width: 8px; }
+html.dark ::-webkit-scrollbar-track { background: transparent; }
+html.dark ::-webkit-scrollbar-thumb { background: #334155; border-radius: 999px; }
 
 @media (prefers-reduced-motion: no-preference) {
   .animate-enter { animation: enter .35s ease-out both; }

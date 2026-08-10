@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0f172a" />
     <meta name="description" content="A private THB and MMK currency exchange dashboard." />
+    <script>
+      try {
+        if (JSON.parse(localStorage.getItem('exchange-theme-v1')) === 'dark') {
+          document.documentElement.classList.add('dark')
+        }
+      } catch {}
+    </script>
     <title>Baht ↔ Kyat Exchange</title>
   </head>
   <body>

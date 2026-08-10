@@ -1,32 +1,25 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import Calculator from './components/Calculator'
 import Header from './components/Header'
 import History from './components/History'
-import RateSettings from './components/RateSettings'
 import SummaryCards from './components/SummaryCards'
 import { useLocalStorage } from './hooks/useLocalStorage'
-import { calculateTransaction, formatRate, localDateKey } from './utils/currency'
+import { calculateTransaction, localDateKey } from './utils/currency'
 
-const DEFAULT_RATES = { marketBuy: 761, marketSell: 761, buy: 750, sell: 772 }
+const DEFAULT_RATES = { buy: 750, sell: 772 }
 const OLD_DEFAULT_RATES = { market: 102.5, buy: 100, sell: 105 }
 
 function initialRates() {
   try {
+    const latestRates = JSON.parse(window.localStorage.getItem('exchange-rates-v3'))
+    if (latestRates) return { buy: Number(latestRates.buy), sell: Number(latestRates.sell) }
     const currentRates = JSON.parse(window.localStorage.getItem('exchange-rates-v2'))
-    if (currentRates) return {
-      marketBuy: Number(currentRates.marketBuy ?? currentRates.market),
-      marketSell: Number(currentRates.marketSell ?? currentRates.market),
-      buy: Number(currentRates.buy),
-      sell: Number(currentRates.sell),
-    }
+    if (currentRates) return { buy: Number(currentRates.buy), sell: Number(currentRates.sell) }
     const oldRates = JSON.parse(window.localStorage.getItem('exchange-rates-v1'))
     if (!oldRates) return DEFAULT_RATES
     const wasOldDefault = Object.keys(OLD_DEFAULT_RATES).every((key) => Number(oldRates[key]) === OLD_DEFAULT_RATES[key])
     if (wasOldDefault) return DEFAULT_RATES
-    const convertedMarket = 100_000 / Number(oldRates.market)
     return {
-      marketBuy: convertedMarket,
-      marketSell: convertedMarket,
       buy: 100_000 / Number(oldRates.buy),
       sell: 100_000 / Number(oldRates.sell),
     }
@@ -43,7 +36,6 @@ function initialTransactions() {
       ...item,
       type: item.type === 'buy' ? 'sell' : 'buy',
       rate: 100_000 / item.rate,
-      marketRate: 100_000 / item.marketRate,
     }))
   } catch {
     return []
@@ -51,19 +43,24 @@ function initialTransactions() {
 }
 
 export default function App() {
-  const [rates, setRates] = useLocalStorage('exchange-rates-v3', initialRates)
+  const [rates, setRates] = useLocalStorage('exchange-rates-v4', initialRates)
   const [transactions, setTransactions] = useLocalStorage('exchange-transactions-v2', initialTransactions)
-  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [capital, setCapital] = useLocalStorage('exchange-capital-v1', { thb: 0, mmk: 0 })
+  const [theme, setTheme] = useLocalStorage('exchange-theme-v1', 'light')
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', theme === 'dark')
+  }, [theme])
 
   const todaySummary = useMemo(() => transactions
     .filter((item) => localDateKey(item.createdAt) === localDateKey())
-    .reduce((total, item) => ({
-      thb: total.thb + item.thb,
-      mmk: total.mmk + item.mmk,
-      capital: total.capital + item.capital,
-      profit: total.profit + item.profit,
-      count: total.count + 1,
-    }), { thb: 0, mmk: 0, capital: 0, profit: 0, count: 0 }), [transactions])
+    .reduce(summarizeTransaction, emptySummary()), [transactions])
+
+  const allTimeSummary = useMemo(() => transactions.reduce(summarizeTransaction, emptySummary()), [transactions])
+  const totalNet = useMemo(() => ({
+    thb: (Number(capital.thb) || 0) + allTimeSummary.thb,
+    mmk: (Number(capital.mmk) || 0) + allTimeSummary.mmk,
+  }), [capital, allTimeSummary])
 
   const recordTransaction = ({ type, thb, customerName, phone, direction }) => {
     const calculated = calculateTransaction(type, thb, rates)
@@ -86,25 +83,49 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen pb-10">
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-        <Header onOpenSettings={() => setSettingsOpen(true)} />
-        <main className="space-y-5 sm:space-y-6">
-          <SummaryCards summary={todaySummary} />
-          <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,0.84fr)_minmax(0,1.16fr)] lg:gap-6">
-            <div className="space-y-4 lg:sticky lg:top-6">
-              <Calculator rates={rates} onRecord={recordTransaction} />
-              <button type="button" onClick={() => setSettingsOpen(true)} className="flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-left shadow-sm transition hover:border-brand-200">
-                <span><span className="block text-xs font-bold text-slate-400">Market B/S · Your B/S</span><span className="tabular mt-0.5 block text-sm font-extrabold text-slate-700">{formatRate(rates.marketBuy)} / {formatRate(rates.marketSell)} · {formatRate(rates.buy)} / {formatRate(rates.sell)} THB per 100K</span></span>
-                <span className="text-xs font-bold text-brand-600">Edit</span>
-              </button>
+    <div className="min-h-screen pb-10 lg:h-dvh lg:min-h-0 lg:overflow-hidden lg:pb-0">
+      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:flex lg:h-full lg:flex-col lg:px-8">
+        <Header theme={theme} onToggleTheme={() => setTheme((current) => current === 'dark' ? 'light' : 'dark')} />
+        <main className="space-y-4 lg:flex lg:min-h-0 lg:flex-1 lg:flex-col lg:space-y-3">
+          <DashboardSummary daily={todaySummary} totalNet={totalNet} capital={capital} setCapital={setCapital} />
+          <div className="grid items-start gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(0,0.84fr)_minmax(0,1.16fr)] lg:gap-4 lg:overflow-hidden">
+            <div>
+              <ExchangePanel rates={rates} setRates={setRates} onRecord={recordTransaction} />
             </div>
             <History transactions={transactions} onDelete={deleteTransaction} />
           </div>
         </main>
-        <footer className="py-8 text-center text-xs font-medium text-slate-400">Stored privately on this device · No account required</footer>
+        <footer className="py-8 text-center text-xs font-medium text-slate-400 lg:hidden">Stored privately on this device · No account required</footer>
       </div>
-      {settingsOpen && <RateSettings rates={rates} onSave={setRates} onClose={() => setSettingsOpen(false)} />}
     </div>
+  )
+}
+
+function emptySummary() {
+  return { thb: 0, mmk: 0, count: 0 }
+}
+
+function summarizeTransaction(total, item) {
+  return {
+    thb: total.thb + (item.type === 'sell' ? item.thb : -item.thb),
+    mmk: total.mmk + (item.type === 'buy' ? item.mmk : -item.mmk),
+    count: total.count + 1,
+  }
+}
+
+function DashboardSummary({ daily, totalNet, capital, setCapital }) {
+  return (
+    <SummaryCards
+      daily={daily}
+      totalNet={totalNet}
+      capital={capital}
+      onChangeCapital={(currency, value) => setCapital((current) => ({ ...current, [currency]: value }))}
+    />
+  )
+}
+
+function ExchangePanel({ rates, setRates, onRecord }) {
+  return (
+    <Calculator rates={rates} onChangeRate={(field, value) => setRates((current) => ({ ...current, [field]: value }))} onRecord={onRecord} />
   )
 }
