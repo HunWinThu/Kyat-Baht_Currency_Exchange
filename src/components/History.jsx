@@ -1,37 +1,61 @@
 import { useState } from 'react'
-import { ArrowDownLeft, ArrowUpRight, History as HistoryIcon, Phone, Trash2 } from 'lucide-react'
+import { ArrowDownLeft, ArrowUpRight, CalendarDays, History as HistoryIcon, Phone, Trash2 } from 'lucide-react'
 import { formatDate, formatNumber, formatRate, formatTime, localDateKey } from '../utils/currency'
 
 export default function History({ transactions, onDelete }) {
   const [view, setView] = useState('today')
-  const shown = view === 'today' ? transactions.filter((item) => localDateKey(item.createdAt) === localDateKey()) : transactions
+  const [selectedDate, setSelectedDate] = useState(localDateKey())
+  const activeDate = view === 'today' ? localDateKey() : selectedDate
+  const shown = view === 'all'
+    ? transactions
+    : transactions.filter((item) => localDateKey(item.createdAt) === activeDate)
 
   return (
-    <section className="card animate-enter p-4 sm:p-5 lg:flex lg:h-full lg:min-h-0 lg:flex-col lg:p-3" aria-labelledby="history-heading">
+    <section className="card animate-enter flex h-full min-h-0 flex-col p-4 sm:p-5 lg:p-3" aria-labelledby="history-heading">
       <div className="mb-4 flex shrink-0 items-center justify-between gap-3 lg:mb-2">
         <div>
           <h2 id="history-heading" className="text-xl font-extrabold tracking-tight">Transactions</h2>
         </div>
-        <div className="flex rounded-xl bg-slate-100 p-1 text-xs font-bold">
-          {['today', 'all'].map((item) => <button key={item} type="button" onClick={() => setView(item)} className={`rounded-lg px-3 py-2 capitalize transition ${view === item ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-400'}`}>{item}</button>)}
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <div className="flex rounded-xl bg-slate-100 p-1 text-xs font-bold">
+            {['today', 'all'].map((item) => <button key={item} type="button" onClick={() => setView(item)} className={`rounded-lg px-2.5 py-1.5 capitalize transition ${view === item ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-400'}`}>{item}</button>)}
+          </div>
+          <label className={`flex items-center gap-1.5 rounded-xl border px-2.5 py-1.5 transition ${view === 'date' ? 'border-brand-500 bg-brand-50 text-brand-600' : 'border-slate-200 bg-white text-slate-500'}`}>
+            <CalendarDays size={14} className="shrink-0" />
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(event) => {
+                if (!event.target.value) return
+                setSelectedDate(event.target.value)
+                setView('date')
+              }}
+              aria-label="Filter transactions by date"
+              className="w-[7.2rem] bg-transparent text-[11px] font-bold outline-none"
+            />
+          </label>
         </div>
       </div>
 
       {shown.length === 0 ? (
-        <div className="grid min-h-56 place-items-center rounded-2xl border border-dashed border-slate-200 bg-slate-50/70 p-6 text-center lg:min-h-0 lg:flex-1">
+        <div className="grid min-h-0 flex-1 place-items-center rounded-2xl border border-dashed border-slate-200 bg-slate-50/70 p-6 text-center">
           <div>
             <div className="mx-auto grid size-12 place-items-center rounded-2xl bg-white text-slate-400 shadow-sm"><HistoryIcon size={21} /></div>
-            <p className="mt-3 font-bold text-slate-700">No transactions yet</p>
-            <p className="mt-1 text-sm text-slate-400">Your {view === 'today' ? 'daily ' : ''}records will appear here.</p>
+            <p className="mt-3 font-bold text-slate-700">{view === 'date' ? `No transactions on ${formatSelectedDate(selectedDate)}` : 'No transactions yet'}</p>
+            <p className="mt-1 text-sm text-slate-400">{view === 'all' ? 'Your records will appear here.' : 'Transactions for this date will appear here.'}</p>
           </div>
         </div>
       ) : (
-        <div className="space-y-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1">
+        <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
           {shown.map((transaction) => <TransactionRow key={transaction.id} transaction={transaction} onDelete={onDelete} />)}
         </div>
       )}
     </section>
   )
+}
+
+function formatSelectedDate(dateKey) {
+  return formatDate(new Date(`${dateKey}T00:00:00`))
 }
 
 function TransactionRow({ transaction, onDelete }) {

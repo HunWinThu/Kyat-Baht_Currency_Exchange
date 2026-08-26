@@ -1,0 +1,11 @@
+{
+  "appId": "com.ktoo.moneydesk",
+  "appName": "Money Desk by Ktoo",
+  "webDir": "dist",
+  "server": {
+    "iosScheme": "capacitor"
+  },
+  "ios": {
+    "contentInset": "automatic"
+  }
+}

@@ -2,9 +2,14 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#0f172a" />
-    <meta name="description" content="A private THB and MMK currency exchange dashboard." />
+    <meta name="description" content="A private Thai Baht and Myanmar Kyat exchange desk." />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Money Desk" />
+    <link rel="apple-touch-icon" href="%BASE_URL%icons/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" href="%BASE_URL%icons/favicon-64.png" />
     <script>
       try {
         if (JSON.parse(localStorage.getItem('exchange-theme-v1')) === 'dark') {
@@ -12,7 +17,7 @@
         }
       } catch {}
     </script>
-    <title>Baht ↔ Kyat Exchange</title>
+    <title>Money Desk by Ktoo</title>
   </head>
   <body>
     <div id="root"></div>
