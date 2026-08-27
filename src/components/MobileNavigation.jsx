@@ -72,7 +72,7 @@ export function MobileHomeActions({ onNavigate }) {
   )
 }
 
-export function MobileMenu({ theme, onToggleTheme, cloudEnabled, syncStatus, onRetrySync, onSignOut }) {
+export function MobileMenu({ theme, onToggleTheme, cloudEnabled, syncStatus, onRetrySync, onSignOut, signingOut, signOutError }) {
   return (
     <section className="space-y-4 animate-enter">
       <div className="card overflow-hidden">
@@ -96,8 +96,17 @@ export function MobileMenu({ theme, onToggleTheme, cloudEnabled, syncStatus, onR
       </div>
 
       <div className="card overflow-hidden">
-        <MenuButton icon={LogOut} iconClassName="text-rose-600" title="Sign out" subtitle="Sign out of this device" onClick={onSignOut} danger />
+        <MenuButton
+          icon={signingOut ? RefreshCw : LogOut}
+          iconClassName="text-rose-600"
+          title={signingOut ? 'Signing out…' : 'Sign out'}
+          subtitle="Sign out of this device"
+          onClick={signingOut ? undefined : onSignOut}
+          spinning={signingOut}
+          danger
+        />
       </div>
+      {signOutError && <p className="px-3 text-center text-xs font-bold text-rose-600" role="alert">{signOutError}</p>}
 
       <div className="px-2 text-center">
         <p className="text-xs font-bold text-slate-500">Money Desk by <span className="signature text-lg text-brand-600">Ktoo</span></p>

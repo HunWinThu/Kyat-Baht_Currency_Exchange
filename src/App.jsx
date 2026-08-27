@@ -14,6 +14,8 @@ import { localDateKey } from './utils/currency'
 export default function App() {
   const [theme, setTheme] = useLocalStorage('exchange-theme-v1', 'light')
   const [mobileTab, setMobileTab] = useState('home')
+  const [signingOut, setSigningOut] = useState(false)
+  const [signOutError, setSignOutError] = useState('')
   const { session, loading: authLoading } = useSupabaseAuth()
   const {
     rates,
@@ -55,7 +57,20 @@ export default function App() {
   }
 
   const toggleTheme = () => setTheme((current) => current === 'dark' ? 'light' : 'dark')
-  const signOut = () => supabase?.auth.signOut()
+  const signOut = async () => {
+    if (!supabase || signingOut) return
+    setSigningOut(true)
+    setSignOutError('')
+    try {
+      const { error } = await supabase.auth.signOut({ scope: 'local' })
+      if (error) throw error
+    } catch (error) {
+      console.error('Sign out failed', error)
+      setSignOutError('Could not sign out. Check your connection and try again.')
+    } finally {
+      setSigningOut(false)
+    }
+  }
   const mobileTitle = { home: 'Overview', exchange: 'Exchange', records: 'Records', menu: 'Menu' }[mobileTab]
 
   return (
@@ -122,6 +137,8 @@ export default function App() {
                 syncStatus={syncStatus}
                 onRetrySync={syncFromCloud}
                 onSignOut={signOut}
+                signingOut={signingOut}
+                signOutError={signOutError}
               />
             </div>
           )}

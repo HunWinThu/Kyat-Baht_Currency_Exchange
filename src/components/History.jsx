@@ -3,7 +3,7 @@ import { ArrowDownLeft, ArrowUpRight, CalendarDays, History as HistoryIcon, Phon
 import { formatDate, formatNumber, formatRate, formatTime, localDateKey } from '../utils/currency'
 
 export default function History({ transactions, onDelete }) {
-  const [view, setView] = useState('today')
+  const [view, setView] = useState('all')
   const [selectedDate, setSelectedDate] = useState(localDateKey())
   const activeDate = view === 'today' ? localDateKey() : selectedDate
   const shown = view === 'all'
@@ -15,6 +15,7 @@ export default function History({ transactions, onDelete }) {
       <div className="mb-4 flex shrink-0 items-center justify-between gap-3 lg:mb-2">
         <div>
           <h2 id="history-heading" className="text-xl font-extrabold tracking-tight">Transactions</h2>
+          <p className="mt-0.5 text-[11px] font-semibold text-slate-400">{shown.length} {shown.length === 1 ? 'record' : 'records'} shown</p>
         </div>
         <div className="flex flex-wrap items-center justify-end gap-2">
           <div className="flex rounded-xl bg-slate-100 p-1 text-xs font-bold">
