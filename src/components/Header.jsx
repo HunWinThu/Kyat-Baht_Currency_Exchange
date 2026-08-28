@@ -25,7 +25,10 @@ export default function Header({ theme, onToggleTheme, cloudEnabled, syncStatus,
           {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
         </button>
         {cloudEnabled && (
-          <button type="button" onClick={onSignOut} className="grid size-11 place-items-center rounded-2xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600" aria-label="Sign out" title="Sign out"><LogOut size={18} /></button>
+          <button type="button" onClick={onSignOut} className="flex h-11 items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-3.5 text-sm font-bold text-slate-500 shadow-sm transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600" aria-label="Sign out" title="Sign out">
+            <LogOut size={17} />
+            <span>Sign out</span>
+          </button>
         )}
       </div>
     </header>
