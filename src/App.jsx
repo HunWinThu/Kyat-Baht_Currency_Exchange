@@ -76,7 +76,7 @@ export default function App() {
   return (
     <div className="mobile-app-shell lg:h-dvh lg:min-h-0 lg:overflow-hidden lg:pb-0">
       <div className="mx-auto flex h-full w-full max-w-6xl flex-col px-4 sm:px-6 lg:px-8">
-        <MobileTopBar title={mobileTitle} syncStatus={syncStatus} cloudEnabled={isSupabaseConfigured} />
+        <MobileTopBar title={mobileTitle} cloudEnabled={isSupabaseConfigured} onSignOut={signOut} signingOut={signingOut} />
 
         <div className="hidden lg:block">
           <Header

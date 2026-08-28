@@ -19,7 +19,7 @@ const tabs = [
   { id: 'menu', label: 'Menu', icon: Ellipsis },
 ]
 
-export function MobileTopBar({ title, syncStatus, cloudEnabled }) {
+export function MobileTopBar({ title, cloudEnabled, onSignOut, signingOut }) {
   return (
     <header className="z-30 -mx-4 flex h-16 shrink-0 items-center justify-between border-b border-slate-200/70 bg-canvas/90 px-4 backdrop-blur-xl lg:hidden">
       <div className="flex items-center gap-2.5">
@@ -31,7 +31,12 @@ export function MobileTopBar({ title, syncStatus, cloudEnabled }) {
           <h1 className="text-lg font-extrabold leading-none tracking-tight">{title}</h1>
         </div>
       </div>
-      {cloudEnabled && <SyncBadge status={syncStatus} />}
+      {cloudEnabled && (
+        <button type="button" onClick={onSignOut} disabled={signingOut} className="flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-rose-200 bg-white px-2.5 text-xs font-extrabold text-rose-600 shadow-sm transition active:scale-95 disabled:opacity-60" aria-label="Sign out">
+          {signingOut ? <RefreshCw className="animate-spin" size={15} /> : <LogOut size={15} />}
+          <span className="hidden min-[380px]:inline">{signingOut ? 'Signing out…' : 'Sign out'}</span>
+        </button>
+      )}
     </header>
   )
 }
@@ -113,16 +118,6 @@ export function MobileMenu({ theme, onToggleTheme, cloudEnabled, syncStatus, onR
         <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-widest text-slate-400">Baht ↔ Kyat · Version 1.0</p>
       </div>
     </section>
-  )
-}
-
-function SyncBadge({ status }) {
-  const failed = status === 'error'
-  return (
-    <div className={`flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[10px] font-extrabold ${failed ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'}`}>
-      {failed ? <CloudOff size={13} /> : status === 'syncing' ? <RefreshCw className="animate-spin" size={13} /> : <Cloud size={13} />}
-      {failed ? 'Offline' : status === 'syncing' ? 'Syncing' : 'Synced'}
-    </div>
   )
 }
 
