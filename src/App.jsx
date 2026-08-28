@@ -8,7 +8,7 @@ import { MobileHomeActions, MobileMenu, MobileTabBar, MobileTopBar } from './com
 import { useExchangeData } from './hooks/useExchangeData'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import { useSupabaseAuth } from './hooks/useSupabaseAuth'
-import { isSupabaseConfigured, supabase } from './lib/supabase'
+import { isSupabaseConfigured } from './lib/supabase'
 import { localDateKey } from './utils/currency'
 
 export default function App() {
@@ -16,7 +16,7 @@ export default function App() {
   const [mobileTab, setMobileTab] = useState('home')
   const [signingOut, setSigningOut] = useState(false)
   const [signOutError, setSignOutError] = useState('')
-  const { session, loading: authLoading } = useSupabaseAuth()
+  const { session, loading: authLoading, signOut: signOutSession } = useSupabaseAuth()
   const {
     rates,
     setRates,
@@ -58,11 +58,11 @@ export default function App() {
 
   const toggleTheme = () => setTheme((current) => current === 'dark' ? 'light' : 'dark')
   const signOut = async () => {
-    if (!supabase || signingOut) return
+    if (signingOut) return
     setSigningOut(true)
     setSignOutError('')
     try {
-      const { error } = await supabase.auth.signOut({ scope: 'local' })
+      const { error } = await signOutSession()
       if (error) throw error
     } catch (error) {
       console.error('Sign out failed', error)

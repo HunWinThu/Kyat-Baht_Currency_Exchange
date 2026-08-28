@@ -84,7 +84,7 @@ function TransactionRow({ transaction, onDelete }) {
               <a href={`tel:${transaction.phone}`} className="flex items-center gap-1.5 transition hover:text-brand-600"><Phone size={12} />{transaction.phone}</a>
             </div>
           )}
-          <div className="mt-2 grid grid-cols-3 gap-2 border-t border-slate-200/70 pt-2">
+          <div className="mt-2 space-y-1.5 border-t border-slate-200/70 pt-2">
             <Value label="THB" value={formatNumber(transaction.thb)} />
             <Value label="MMK" value={formatNumber(transaction.mmk)} />
             <Value label="Rate" value={formatRate(transaction.rate)} />
@@ -97,9 +97,9 @@ function TransactionRow({ transaction, onDelete }) {
 
 function Value({ label, value }) {
   return (
-    <div className="min-w-0">
-      <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{label}</p>
-      <p className="tabular mt-0.5 truncate text-xs font-extrabold text-slate-700 sm:text-sm">{value}</p>
+    <div className="flex min-w-0 items-baseline justify-between gap-4">
+      <p className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-slate-400">{label}</p>
+      <p className="tabular min-w-0 break-words text-right text-sm font-extrabold text-slate-700 [overflow-wrap:anywhere]">{value}</p>
     </div>
   )
 }

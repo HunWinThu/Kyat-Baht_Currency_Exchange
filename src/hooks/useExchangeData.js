@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase'
 import { calculateTransaction } from '../utils/currency'
 import { useLocalStorage } from './useLocalStorage'
 
-const DEFAULT_RATES = { buy: 750, sell: 772 }
+const DEFAULT_RATES = { buy: '', sell: '' }
 const OLD_DEFAULT_RATES = { market: 102.5, buy: 100, sell: 105 }
 
 export function useExchangeData(user) {
@@ -25,6 +25,10 @@ export function useExchangeData(user) {
 
   const userId = user?.id
 
+  useEffect(() => {
+    setRates((current) => isLegacyDefaultRates(current) ? DEFAULT_RATES : current)
+  }, [setRates])
+
   const syncFromCloud = useCallback(async () => {
     if (!supabase || !userId) return
     setSyncStatus('syncing')
@@ -45,7 +49,8 @@ export function useExchangeData(user) {
       if (settingsError) throw settingsError
 
       if (cloudSettings) {
-        setRates({ buy: cloudSettings.buy_rate, sell: cloudSettings.sell_rate })
+        const cloudRates = { buy: cloudSettings.buy_rate, sell: cloudSettings.sell_rate }
+        setRates(isLegacyDefaultRates(cloudRates) ? DEFAULT_RATES : cloudRates)
         setCapital({ thb: cloudSettings.capital_thb, mmk: cloudSettings.capital_mmk })
       } else {
         const { error } = await supabase.from('exchange_settings').upsert(toSettingsRow(userId, ratesRef.current, capitalRef.current))
@@ -173,6 +178,10 @@ function toSettingsRow(userId, rates, capital) {
     capital_mmk: Number(capital.mmk) || 0,
     updated_at: new Date().toISOString(),
   }
+}
+
+function isLegacyDefaultRates(rates) {
+  return Number(rates?.buy) === 750 && Number(rates?.sell) === 772
 }
 
 function initialRates() {

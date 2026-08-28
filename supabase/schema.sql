@@ -18,8 +18,8 @@ create index if not exists transactions_user_created_idx
 
 create table if not exists public.exchange_settings (
   user_id uuid primary key references auth.users(id) on delete cascade,
-  buy_rate numeric not null default 750 check (buy_rate >= 0),
-  sell_rate numeric not null default 772 check (sell_rate >= 0),
+  buy_rate numeric not null default 0 check (buy_rate >= 0),
+  sell_rate numeric not null default 0 check (sell_rate >= 0),
   capital_thb numeric not null default 0 check (capital_thb >= 0),
   capital_mmk numeric not null default 0 check (capital_mmk >= 0),
   updated_at timestamptz not null default now()

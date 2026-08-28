@@ -91,7 +91,6 @@ function RateInput({ label, value, onChange }) {
         <input type="number" min="0" step="any" inputMode="decimal" value={value} onChange={(event) => onChange(event.target.value)} placeholder="0" className="tabular min-w-0 flex-1 bg-transparent text-lg font-extrabold text-slate-800 outline-none placeholder:text-slate-300" />
         <span className="text-[9px] font-bold text-slate-400">THB</span>
       </span>
-      <span className="text-[9px] font-semibold text-slate-400">per 100K MMK</span>
     </label>
   )
 }
